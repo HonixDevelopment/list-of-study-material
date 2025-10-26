@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Study Hub — Science & Social Science</title>
+  <style>
+    :root{
+      --bg:#f2f4f8; --glass: rgba(255,255,255,0.65);
+      --muted:#6b7280; --accent:#0b84ff; --accent-2:#5b21b6;
+      --radius:14px; --shadow: 0 6px 18px rgba(12,18,30,0.08);
+      --glass-2: rgba(255,255,255,0.55);
+    }
+    /* macOS-like system font stack */
+    html,body{height:100%;}
+    body{
+      margin:0;font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: linear-gradient(180deg,#e9eef6 0%, #f7f9fc 100%);
+      color:#0f1724; -webkit-font-smoothing:antialiased; padding:32px;
+      -webkit-user-select:none; user-select:none;
+    }
+
+    .window{
+      max-width:1100px; margin:0 auto; background:var(--glass);
+      border-radius:18px; padding:14px; box-shadow:var(--shadow);
+      backdrop-filter: blur(10px) saturate(120%); border:1px solid rgba(80,100,130,0.06);
+    }
+
+    /* Title bar */
+    .titlebar{display:flex;align-items:center;gap:12px;padding:10px 14px}
+    .traffic{display:flex;gap:8px;align-items:center}
+    .dot{width:12px;height:12px;border-radius:50%}
+    .dot.red{background:#ff5f57}
+    .dot.yellow{background:#ffbd2e}
+    .dot.green{background:#28c940}
+    .title{flex:1;text-align:center;font-weight:600}
+    .controls{display:flex;gap:8px}
+
+    /* Layout */
+    .content{display:grid;grid-template-columns:260px 1fr;gap:18px;padding:18px}
+    @media (max-width:820px){.content{grid-template-columns:1fr;}}
+
+    /* Sidebar */
+    .sidebar{background:linear-gradient(180deg, rgba(255,255,255,0.7), rgba(255,255,255,0.5)); padding:14px;border-radius:12px}
+    .logo{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+    .logo .icon{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,var(--accent),var(--accent-2)); display:flex;align-items:center;justify-content:center;color:white;font-weight:700}
+    nav ul{list-style:none;padding:0;margin:0}
+    nav li{margin:8px 0}
+    .nav-link{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;color:var(--muted);text-decoration:none}
+    .nav-link:hover{background:rgba(11,132,255,0.08);color:var(--accent)}
+
+    .subject-toggle{display:flex;gap:8px;margin:12px 0}
+    .subject-btn{flex:1;padding:8px;border-radius:10px;border:1px solid rgba(12,18,30,0.04);background:transparent;cursor:pointer}
+    .subject-btn.active{background:linear-gradient(90deg,rgba(11,132,255,0.12),rgba(91,33,182,0.06));color:var(--accent);font-weight:600}
+
+    /* Main area */
+    .main-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+    .search{flex:1;display:flex;gap:8px;align-items:center}
+    .search input{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(10,20,40,0.06);background:white}
+    .mobile-nav-btn{display:none}
+    @media (max-width:820px){.mobile-nav-btn{display:inline-flex}}
+
+    .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+    @media (max-width:960px){.cards{grid-template-columns:1fr}}
+
+    .card{background:white;border-radius:12px;padding:14px;box-shadow:0 6px 18px rgba(12,18,30,0.05);border:1px solid rgba(10,20,40,0.03)}
+    .card h3{margin:0 0 8px 0}
+    .link-list{list-style:none;padding:0;margin:0}
+    .link-list li{padding:8px 6px;border-radius:8px}
+    .link-list a{display:block;text-decoration:none;color:#0b61b6}
+    .link-list a:hover{text-decoration:underline}
+
+    footer{margin-top:16px;padding:10px;text-align:center;color:var(--muted);font-size:13px}
+
+    /* mobile nav overlay */
+    .overlay{position:fixed;inset:0;display:none}
+    .overlay.open{display:block;background:rgba(10,12,20,0.35)}
+    .mobile-drawer{position:fixed;left:0;top:0;bottom:0;width:300px;background:var(--glass-2);backdrop-filter: blur(6px);box-shadow:var(--shadow);padding:18px;transform:translateX(-110%);transition:transform .26s}
+    .mobile-drawer.open{transform:translateX(0)}
+
+    /* small details */
+    .small{font-size:13px;color:var(--muted)}
+    .pill{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid rgba(11,132,255,0.12);font-weight:600;color:var(--accent)}
+
+  </style>
+</head>
+<body>
+  <div class="window" role="application" aria-label="Study Hub">
+    <div class="titlebar">
+      <div class="traffic" aria-hidden="true">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+      </div>
+      <div class="title">Study Hub — Science & Social Science</div>
+      <div class="controls small">macOS style • Responsive</div>
+    </div>
+
+    <div class="content">
+      <!-- SIDEBAR -->
+      <aside class="sidebar" id="sidebar">
+        <div class="logo">
+          <div class="icon">SH</div>
+          <div>
+            <div style="font-weight:700">Study Hub</div>
+            <div class="small">Science • Social Science</div>
+          </div>
+        </div>
+
+        <div class="subject-toggle" role="tablist" aria-label="Select subject">
+          <button class="subject-btn active" data-subject="science" role="tab" aria-selected="true">Science</button>
+          <button class="subject-btn" data-subject="social" role="tab">Social Science</button>
+        </div>
+
+        <nav aria-label="primary">
+          <ul>
+            <li><a class="nav-link" href="#science" onclick="showSection('science')">🔬 Science Notes</a></li>
+            <li><a class="nav-link" href="#social" onclick="showSection('social')">📚 Social Science Notes</a></li>
+            <li><a class="nav-link" href="https://drive.google.com/file/d/1RRKIde54CigZMj99bxpfeVYm0qUWn046/view" target="_blank" rel="noopener">Science Activity Booklet</a></li>
+            <li><a class="nav-link" href="https://drive.google.com/file/d/1tiKasSvEgG3JAhsNlWVxLtN5EIwd0GqG/view" target="_blank" rel="noopener">Social Science NCERT Booklet</a></li>
+            <li><a class="nav-link" href="#" onclick="document.getElementById('search').focus();return false;">Search notes</a></li>
+          </ul>
+        </nav>
+
+        <div style="margin-top:12px" class="small">Quick links</div>
+        <ul style="margin-top:8px">
+          <li><a class="nav-link" href="#science">All Science</a></li>
+          <li><a class="nav-link" href="#social">All Social Science</a></li>
+        </ul>
+      </aside>
+
+      <!-- MAIN -->
+      <main>
+        <div class="main-top">
+          <div class="search">
+            <button class="mobile-nav-btn" aria-label="Open menu" onclick="openMobileNav()">☰</button>
+            <input id="search" placeholder="Search notes (try: 'Electricity', 'Federalism')" aria-label="Search notes" oninput="filterNotes(this.value)" />
+          </div>
+          <div style="margin-left:12px">
+            <span class="pill">Free • Offline links</span>
+          </div>
+        </div>
+
+        <div class="cards">
+          <!-- SCIENCE CARD -->
+          <section id="science" class="card" aria-labelledby="sciTitle">
+            <h3 id="sciTitle">🔬 Science Notes</h3>
+            <p class="small">Open the topic you need. All links open in a new tab.</p>
+            <ul class="link-list" id="science-list">
+              <li><a href="https://drive.google.com/file/d/1vSz3wnr3s2D0FFvNgAZqgPS9Pff41acb/view?usp=share_link" target="_blank" rel="noopener">Chemical Reaction</a></li>
+              <li><a href="https://drive.google.com/file/d/1u-gh7CZ3Xgh2lZmub2HaI37NdyjX2oQN/view?usp=share_link" target="_blank" rel="noopener">Acids & Bases</a></li>
+              <li><a href="https://drive.google.com/file/d/1aIoPLmg3KBT2lkwu_cdQjh2A6GF_9mXe/view?usp=share_link" target="_blank" rel="noopener">Metals and Non-metals</a></li>
+              <li><a href="https://drive.google.com/file/d/1zr5CnEnTwrylrHAcGAHv5-blEKiiTeX-/view?usp=share_link" target="_blank" rel="noopener">Carbon</a></li>
+              <li><a href="https://drive.google.com/file/d/15grtayzNJ1s9ElJaGPTqoIHP9PvzN_Xe/view?usp=share_link" target="_blank" rel="noopener">Life Processes</a></li>
+              <li><a href="https://drive.google.com/file/d/1r2CTVAuQV4T6FrPt7jLenhRH6vvQXHm4/view?usp=share_link" target="_blank" rel="noopener">Control & Coordination</a></li>
+              <li><a href="https://drive.google.com/file/d/1xp_CzWziZ11fmiphvPEYrLYVJaXMTY-B/view?usp=share_link" target="_blank" rel="noopener">Reproduction</a></li>
+              <li><a href="https://drive.google.com/file/d/1Jl8_evRgWm-B6W3urtOp5AbrukQNHwZf/view?usp=share_link" target="_blank" rel="noopener">Heredity & Evolution</a></li>
+              <li><a href="https://drive.google.com/file/d/1erfyaJGp8pfZjotnB48PCuBkahrbB0eF/view?usp=share_link" target="_blank" rel="noopener">Light</a></li>
+              <li><a href="https://drive.google.com/file/d/1j3b2khR2aXAwWJRTKEdklBphPGG-1wMp/view?usp=share_link" target="_blank" rel="noopener">Human Eye</a></li>
+              <li><a href="https://drive.google.com/file/d/1U8TN612l8kYC9bahQ-en83WOjaJCv0fD/view?usp=share_link" target="_blank" rel="noopener">Electricity</a></li>
+              <li><a href="https://drive.google.com/file/d/1I5oIyGkqlsC4cLKjM2vbG86vZbrRVqi7/view?usp=share_link" target="_blank" rel="noopener">Magnetic Effects</a></li>
+              <li><a href="https://drive.google.com/file/d/1cdVkQhpUYsjwu_iFhCuNTd28CBXLv3lw/view?usp=share_link" target="_blank" rel="noopener">Our Environment</a></li>
+            </ul>
+          </section>
+
+          <!-- SOCIAL SCIENCE CARD -->
+          <section id="social" class="card" aria-labelledby="socTitle" style="display:none">
+            <h3 id="socTitle">📚 Social Science Notes</h3>
+            <p class="small">Civics • Geography • Economics • History</p>
+
+            <h4 style="margin-top:10px;margin-bottom:6px">Civics</h4>
+            <ul class="link-list" id="civics-list">
+              <li><a href="https://drive.google.com/file/d/1MHNJr90Lwm2GPYP-KBdwe6BC8P1AxFf9/view?usp=share_link" target="_blank" rel="noopener">Power Sharing</a></li>
+              <li><a href="https://drive.google.com/file/d/1RpT-5kCsjcAhZdXILW_kRIx9LltjN7zx/view?usp=sharing" target="_blank" rel="noopener">Federalism</a></li>
+              <li><a href="https://drive.google.com/file/d/1MBBYXFfUoqKlDrmQx_XgOHpuYNtUdt9c/view?usp=share_link" target="_blank" rel="noopener">Gender, Religion & Caste</a></li>
+              <li><a href="https://drive.google.com/file/d/1EILzM2T8OdlctUvA_UZ6-EpxN1uVY8Pl/view?usp=share_link" target="_blank" rel="noopener">Political Parties</a></li>
+              <li><a href="https://drive.google.com/file/d/1nQ1cZvLILgqGrHIyU3-bPM-Gve2EhvjM/view?usp=share_link" target="_blank" rel="noopener">Outcomes of Democracy</a></li>
+            </ul>
+
+            <h4 style="margin-top:10px;margin-bottom:6px">Geography</h4>
+            <ul class="link-list" id="geo-list">
+              <li><a href="https://drive.google.com/file/d/1L05Ii3bjzSxfn_Gcn10axjD6tyKu_gnR/view?usp=share_link" target="_blank" rel="noopener">Resources & Development</a></li>
+              <li><a href="https://drive.google.com/file/d/1NTu5J9CibqCI0hvE4PuBx1b--NEcfTJZ/view?usp=share_link" target="_blank" rel="noopener">Forest & Wildlife</a></li>
+              <li><a href="https://drive.google.com/file/d/1OMCzWb08XhOyaXhnLTcS8n-na2tqLwka/view?usp=share_link" target="_blank" rel="noopener">Water Resources</a></li>
+              <li><a href="https://drive.google.com/file/d/13vWt6K17cgQCDe1GY56b7bkTbZfCZFSa/view?usp=share_link" target="_blank" rel="noopener">Agriculture</a></li>
+              <li><a href="https://drive.google.com/file/d/1zKdATWt9V6amW9t5Sj6r35FR5oE9w2AP/view?usp=share_link" target="_blank" rel="noopener">Minerals & Energy Resources</a></li>
+              <li><a href="https://drive.google.com/file/d/17uz0NPsy-mqTyfSK5Z5RRXDMjqJlbdQ7/view?usp=share_link" target="_blank" rel="noopener">Manufacturing Industries</a></li>
+              <li><a href="https://drive.google.com/file/d/1VC8FMRN7PAI6hLHPCG8UV9QfAVsHO-3K/view?usp=share_link" target="_blank" rel="noopener">Lifelines of National Economy</a></li>
+            </ul>
+
+            <h4 style="margin-top:10px;margin-bottom:6px">Economics</h4>
+            <ul class="link-list" id="eco-list">
+              <li><a href="https://drive.google.com/file/d/1d7-pGLOUz5mksKGYYFFJ3rV9c38KC9mF/view?usp=share_link" target="_blank" rel="noopener">Development</a></li>
+              <li><a href="https://drive.google.com/file/d/1aJQAscdk4Q9wvIT-f-58Qmp0VqFyCs-9/view?usp=share_link" target="_blank" rel="noopener">Sectors of the Indian Economy</a></li>
+              <li><a href="https://drive.google.com/file/d/1lfC8n_cbDjqodz_ccDOZgiTUuEnf_K4d/view?usp=share_link" target="_blank" rel="noopener">Money & Credit</a></li>
+              <li><a href="https://drive.google.com/file/d/1h5CjMRGXXVpoNxinQFPGHXu_UrXM79hA/view?usp=share_link" target="_blank" rel="noopener">Globalisation & the Indian Economy</a></li>
+            </ul>
+
+            <h4 style="margin-top:10px;margin-bottom:6px">History (recommended NCERT)</h4>
+            <ul class="link-list" id="his-list">
+              <li><a href="https://drive.google.com/file/d/1cNwn41co2dgA3Rftu2Cb8tbY-L5bE9D6/view?usp=share_link" target="_blank" rel="noopener">The Rise of Nationalism in Europe</a></li>
+              <li><a href="https://drive.google.com/file/d/1A8GqOLDW53MK3jx_5VK6LFjhHmfJoFdW/view?usp=share_link" target="_blank" rel="noopener">Nationalism in India</a></li>
+              <li><a href="https://drive.google.com/file/d/1GHJ0eJTf0SiemT4dP2WGUg2Woyvn6pyg/view?usp=share_link" target="_blank" rel="noopener">The Making of a Global World</a></li>
+              <li><a href="https://drive.google.com/file/d/1xC8j4H8J5ObyZ5YAY6BV_ikE6J4VWCoQ/view?usp=share_link" target="_blank" rel="noopener">The Age of Industrialization</a></li>
+              <li><a href="https://drive.google.com/file/d/1UwwTdM8X0X0H7nzhkhY4R7evkZ7hE0DB/view?usp=share_link" target="_blank" rel="noopener">Print Culture & the Modern World</a></li>
+            </ul>
+
+          </section>
+        </div>
+
+        <footer>Made with care · macOS-like UI · Responsive • Try the search above</footer>
+      </main>
+    </div>
+  </div>
+
+  <!-- Mobile drawer + overlay -->
+  <div id="overlay" class="overlay" onclick="closeMobileNav()"></div>
+  <div id="mobileDrawer" class="mobile-drawer" aria-hidden="true">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-weight:700">Menu</div>
+      <button onclick="closeMobileNav()" aria-label="Close menu">✕</button>
+    </div>
+    <nav>
+      <ul style="padding:0;margin:0;list-style:none">
+        <li style="margin-bottom:8px"><a href="#science" onclick="mobileNavPick('science');return false">Science Notes</a></li>
+        <li style="margin-bottom:8px"><a href="#social" onclick="mobileNavPick('social');return false">Social Science</a></li>
+        <li style="margin-bottom:8px"><a href="https://drive.google.com/file/d/1RRKIde54CigZMj99bxpfeVYm0qUWn046/view" target="_blank" rel="noopener">Science Activity Booklet</a></li>
+        <li style="margin-bottom:8px"><a href="https://drive.google.com/file/d/1tiKasSvEgG3JAhsNlWVxLtN5EIwd0GqG/view" target="_blank" rel="noopener">Social Science NCERT Booklet</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <script>
+    // subject toggle behavior
+    document.querySelectorAll('.subject-btn').forEach(btn => {
+      btn.addEventListener('click', e => {
+        document.querySelectorAll('.subject-btn').forEach(b=>b.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        const sub = e.currentTarget.dataset.subject;
+        showSection(sub);
+      });
+    });
+
+    function showSection(sub){
+      const sci = document.getElementById('science');
+      const soc = document.getElementById('social');
+      if(sub === 'science'){sci.style.display = ''; soc.style.display = 'none';}
+      else {sci.style.display = 'none'; soc.style.display = '';}
+      // collapse mobile drawer if open
+      closeMobileNav();
+    }
+
+    // mobile nav
+    function openMobileNav(){ document.getElementById('overlay').classList.add('open'); document.getElementById('mobileDrawer').classList.add('open'); document.getElementById('mobileDrawer').setAttribute('aria-hidden','false'); }
+    function closeMobileNav(){ document.getElementById('overlay').classList.remove('open'); document.getElementById('mobileDrawer').classList.remove('open'); document.getElementById('mobileDrawer').setAttribute('aria-hidden','true'); }
+    function mobileNavPick(s){ showSection(s); closeMobileNav(); }
+
+    // simple filter
+    function filterNotes(q){
+      q = q.trim().toLowerCase();
+      const lists = document.querySelectorAll('.link-list');
+      lists.forEach(list => {
+        let anyVisible = false;
+        Array.from(list.children).forEach(li => {
+          const a = li.querySelector('a');
+          const text = (a.textContent||a.innerText||'').toLowerCase();
+          if(!q || text.includes(q)) { li.style.display = ''; anyVisible = true; }
+          else li.style.display = 'none';
+        });
+        // if no matches in the whole list, show a helper
+        if(!anyVisible && q){
+          if(!list.nextElementSibling || !list.nextElementSibling.classList || !list.nextElementSibling.classList.contains('no-match')){
+            const nm = document.createElement('div'); nm.className='no-match small'; nm.style.marginTop='8px'; nm.textContent='No matches in this section'; list.parentNode.appendChild(nm);
+          }
+        } else { const nm = list.parentNode.querySelector('.no-match'); if(nm) nm.remove(); }
+      });
+    }
+
+    // keyboard accessibility: '/' to focus search
+    document.addEventListener('keydown', e => { if(e.key === '/' && document.activeElement.tagName !== 'INPUT') { e.preventDefault(); document.getElementById('search').focus(); } });
+
+    // initial: show science
+    showSection('science');
+  </script>
+</body>
+</html>
